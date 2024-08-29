@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_product_multi_image,access_product_multi_image,model_multi_product_image,,1,1,1,1
+access_product_brand,access_product_brand,model_product_brand,,1,1,1,1
+access_magento_visibility,Magento Visibility,model_magento_visibility,,1,1,1,0
+access_magento_food_icon,Magento Food Icon,model_magento_food_icon,,1,1,1,0
+access_magento_dispose_ticks,Magento Dispose Ticks,model_magento_dispose_ticks,,1,1,1,0
+
