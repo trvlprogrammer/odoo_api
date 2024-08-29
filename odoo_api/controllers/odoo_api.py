@@ -5,9 +5,9 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-class MyApiController(http.Controller):  # Make sure "Controller" is spelled correctly
+class MyApiController(http.Controller): 
 
-    @http.route('/api', type='http', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api', type='http', auth='api_key', methods=['POST'], csrf=False)
     def odoo_api(self, **kwargs):
         try:
 
@@ -16,7 +16,7 @@ class MyApiController(http.Controller):  # Make sure "Controller" is spelled cor
             
             if data.get("Filter"):
                 if header.get("HTTP_ODOO_ACTION") == "GetInvoice":
-                    models = request.env['account.move'].sudo()
+                    models = request.env['account.move']
                     if hasattr(models, 'GetInvoice'):
                         response_data = getattr(models, 'GetInvoice')(data.get("Filter"))
 
