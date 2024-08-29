@@ -2,24 +2,15 @@
 from odoo import models, fields
 import datetime
 from datetime import date
+from datetime import date, timedelta
 
 class MyModel(models.Model):
     _inherit = 'account.move'
     
     
     def GetInvoice(self,data):
-        # domain = [("move_type","=","out_invoice")]
         domain = []
         response = []
-        # if data.get("name"):
-        #     domain.append(("name","in", data.get("name")))
-
-        # if data.get("company_id"):
-        #     domain.append(("company_id","in", data.get("company_id")))
-
-        # if data.get("move_type"):
-        #     domain.append(("move_type","in",data.get("move_type")))
-
         if data.get("name"):
             domain.append(("name", "in", data.get("name")))
 
@@ -62,6 +53,24 @@ class MyModel(models.Model):
             if domain:
                 domain.insert(0, '&')
             domain.append(("invoice_date", "<=", data.get("invoice_date_to")))
+
+        if data.get("invoice_date"):
+            today = date.today()
+            if data.get("invoice_date") == "this_month":                
+                first_day_of_month = today.replace(day=1)
+                last_day_of_month = today.replace(day=1).replace(month=today.month + 1, day=1) - timedelta(days=1)
+                if domain:
+                    domain.insert(0, '&')
+                domain.append(("invoice_date", ">=", first_day_of_month))
+                domain.append(("invoice_date", "<=", last_day_of_month))
+
+            elif data.get("invoice_date") == "this_year":
+                first_day_of_year = today.replace(month=1, day=1)
+                last_day_of_year = today.replace(month=12, day=31)
+                if domain:
+                    domain.insert(0, '&')
+                domain.append(("invoice_date", ">=", first_day_of_year))
+                domain.append(("invoice_date", "<=", last_day_of_year))
 
         if data.get("state"):
             if domain:
