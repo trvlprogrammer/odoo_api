@@ -42,6 +42,16 @@ class MyModel(models.Model):
             if domain:
                 domain.insert(0, '&')
             domain.append(("create_date", "<=", data.get("create_date_to")))
+
+        if data.get("update_from"):
+            if domain:
+                domain.insert(0, '&')
+            domain.append(("write_date", ">=", data.get("update_from")))
+
+        if data.get("update_to"):
+            if domain:
+                domain.insert(0, '&')
+            domain.append(("write_date", "<=", data.get("update_to")))
         
         if data.get("invoice_date_from"):
             if domain:
