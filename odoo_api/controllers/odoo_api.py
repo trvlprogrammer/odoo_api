@@ -13,7 +13,7 @@ class MyApiController(http.Controller):
 
             header = request.httprequest.headers.environ
             data = request.get_json_data()
-            
+            response_data = []
             if data.get("Filter"):
                 if header.get("HTTP_ODOO_ACTION") == "GetInvoice":
                     models = request.env['account.move']
