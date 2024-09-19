@@ -15,7 +15,7 @@ class MyApiController(http.Controller):
             data = request.get_json_data()
             response_data = []
             if data.get("Filter"):
-                if header.get("HTTP_ODOO_ACTION") == "GetInvoice":
+                if header.get("HTTP_ODOO_ACTION") == "GetInvoice" or data.get("ODOO_ACTION")=="GetInvoice":
                     models = request.env['account.move']
                     if hasattr(models, 'GetInvoice'):
                         response_data = getattr(models, 'GetInvoice')(data.get("Filter"))
