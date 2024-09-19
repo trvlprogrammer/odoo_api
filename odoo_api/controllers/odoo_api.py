@@ -12,7 +12,9 @@ class MyApiController(http.Controller):
         try:
 
             header = request.httprequest.environ
-            data = request.get_json_data()
+            # data = request.get_json_data()
+            json_data = request.httprequest.get_data(as_text=True)
+            data = json.loads(json_data)
             response_data = []
             if data.get("Filter"):
                 if header.get("HTTP_ODOO_ACTION") == "GetInvoice" or data.get("ODOO_ACTION")=="GetInvoice":
