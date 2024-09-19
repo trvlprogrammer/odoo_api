@@ -25,6 +25,7 @@ class MyApiController(http.Controller):
                     data["header"] = header
                     response_data = data
             else :
+                data["header"] = header
                 response_data = data
 
             return Response(
