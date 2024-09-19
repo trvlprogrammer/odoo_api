@@ -19,6 +19,11 @@ class MyApiController(http.Controller):
                     models = request.env['account.move']
                     if hasattr(models, 'GetInvoice'):
                         response_data = getattr(models, 'GetInvoice')(data.get("Filter"))
+                else :
+                    data["header"] = header
+                    response_data = data
+            else :
+                response_data = data
 
             return Response(
                 json.dumps({
