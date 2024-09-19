@@ -11,7 +11,7 @@ class MyApiController(http.Controller):
     def odoo_api(self, **kwargs):
         try:
 
-            header = request.httprequest.headers.environ
+            header = request.httprequest.environ
             data = request.get_json_data()
             response_data = []
             if data.get("Filter"):
