@@ -21,6 +21,18 @@ class MyApiController(http.Controller):
                     models = request.env['account.move']
                     if hasattr(models, 'GetInvoice'):
                         response_data = getattr(models, 'GetInvoice')(data.get("Filter"))
+                elif header.get("HTTP_ODOO_ACTION") == "GetOrder" or data.get("ODOO_ACTION")=="GetOrder":
+                    models = request.env['sale.order']
+                    if hasattr(models, 'GetOrder'):
+                        response_data = getattr(models, 'GetOrder')(data.get("Filter"))
+                elif header.get("HTTP_ODOO_ACTION") == "GetDeliveryOrder" or data.get("ODOO_ACTION")=="GetDeliveryOrder":
+                    models = request.env['stock.picking']
+                    if hasattr(models, 'GetDeliveryOrder'):
+                        response_data = getattr(models, 'GetDeliveryOrder')(data.get("Filter"))
+                elif header.get("HTTP_ODOO_ACTION") == "GetActivity" or data.get("ODOO_ACTION")=="GetActivity":
+                    models = request.env['crm.activity.report']
+                    if hasattr(models, 'GetActivity'):
+                        response_data = getattr(models, 'GetActivity')(data.get("Filter"))
                 else :
                     data["header"] = header
                     response_data = data

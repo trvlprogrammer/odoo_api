@@ -11,7 +11,7 @@
     """,
     'category': 'sale',
     'images' : [],
-    'depends' : ['base', 'sale_management', 'stock', 'account', "web", "auth_api_key"],
+    'depends' : ['base', 'sale_management', 'stock',"crm", 'account', "web", "auth_api_key"],
     'data': [
         
     ],
