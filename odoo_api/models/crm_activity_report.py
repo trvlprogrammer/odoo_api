@@ -35,34 +35,69 @@ class CrmActivityReport(models.Model):
         if data.get("create_date_from"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("create_date", ">=", data.get("create_date_from")))
+            try:
+                create_date_from = datetime.strptime(data.get("create_date_from"), '%Y-%m-%d %H:%M:%S')
+                create_date_from = create_date_from - timedelta(hours=timezone)
+                create_date_from = create_date_from.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                create_date_from = datetime.strptime(data.get("create_date_from"), '%Y-%m-%d')
+            domain.append(("create_date", ">=", create_date_from))
 
         if data.get("create_date_to"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("create_date", "<=", data.get("create_date_to")))
+            try:
+                create_date_to = datetime.strptime(data.get("create_date_to"), '%Y-%m-%d %H:%M:%S')
+                create_date_to = create_date_to - timedelta(hours=timezone)
+                create_date_to = create_date_to.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                create_date_to = datetime.strptime(data.get("create_date_to"), '%Y-%m-%d')
+            domain.append(("create_date", "<=", create_date_to))
 
         if data.get("update_from"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("write_date", ">=", data.get("update_from")))
+            try:
+                update_from = datetime.strptime(data.get("update_from"), '%Y-%m-%d %H:%M:%S')
+                update_from = update_from - timedelta(hours=timezone)
+                update_from = update_from.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                update_from = datetime.strptime(data.get("update_from"), '%Y-%m-%d')
+            domain.append(("write_date", ">=", update_from))
 
         if data.get("update_to"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("write_date", "<=", data.get("update_to")))
+            try:
+                update_to = datetime.strptime(data.get("update_to"), '%Y-%m-%d %H:%M:%S')
+                update_to = update_to - timedelta(hours=timezone)
+                update_to = update_to.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                update_to = datetime.strptime(data.get("update_to"), '%Y-%m-%d')
+            domain.append(("write_date", "<=", update_to))
         
         if data.get("date_from"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("date", ">=", data.get("invoice_date_from")))
+            try:
+                date_from = datetime.strptime(data.get("date_from"), '%Y-%m-%d %H:%M:%S')
+                date_from = date_from - timedelta(hours=timezone)
+                date_from = date_from.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                date_from = datetime.strptime(data.get("date_from"), '%Y-%m-%d')
+            domain.append(("date", ">=", date_from))
 
         if data.get("date_to"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("date", "<=", data.get("invoice_date_to")))
+            try:
+                date_to = datetime.strptime(data.get("date_to"), '%Y-%m-%d %H:%M:%S')
+                date_to = date_to - timedelta(hours=timezone)
+                date_to = date_to.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                date_to = datetime.strptime(data.get("date_to"), '%Y-%m-%d')
+            domain.append(("date", "<=", date_to))
 
-        from datetime import datetime, timedelta
 
         if data.get("date"):
             today = datetime.now()

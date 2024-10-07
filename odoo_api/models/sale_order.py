@@ -29,32 +29,69 @@ class SaleOrder(models.Model):
         if data.get("create_date_from"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("create_date", ">=", data.get("create_date_from")))
+            try:
+                create_date_from = datetime.strptime(data.get("create_date_from"), '%Y-%m-%d %H:%M:%S')
+                create_date_from = create_date_from - timedelta(hours=timezone)
+                create_date_from = create_date_from.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                create_date_from = datetime.strptime(data.get("create_date_from"), '%Y-%m-%d')
+            domain.append(("create_date", ">=", create_date_from))
 
         if data.get("create_date_to"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("create_date", "<=", data.get("create_date_to")))
+            try:
+                create_date_to = datetime.strptime(data.get("create_date_to"), '%Y-%m-%d %H:%M:%S')
+                create_date_to = create_date_to - timedelta(hours=timezone)
+                create_date_to = create_date_to.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                create_date_to = datetime.strptime(data.get("create_date_to"), '%Y-%m-%d')
+            domain.append(("create_date", "<=", create_date_to))
 
         if data.get("update_from"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("write_date", ">=", data.get("update_from")))
+            try:
+                update_from = datetime.strptime(data.get("update_from"), '%Y-%m-%d %H:%M:%S')
+                update_from = update_from - timedelta(hours=timezone)
+                update_from = update_from.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                update_from = datetime.strptime(data.get("update_from"), '%Y-%m-%d')
+            domain.append(("write_date", ">=", update_from))
 
         if data.get("update_to"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("write_date", "<=", data.get("update_to")))
+            try:
+                update_to = datetime.strptime(data.get("update_to"), '%Y-%m-%d %H:%M:%S')
+                update_to = update_to - timedelta(hours=timezone)
+                update_to = update_to.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                update_to = datetime.strptime(data.get("update_to"), '%Y-%m-%d')
+            domain.append(("write_date", "<=", update_to))
         
         if data.get("order_date_from"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("date_order", ">=", data.get("order_date_from")))
+            try:
+                order_date_from = datetime.strptime(data.get("order_date_from"), '%Y-%m-%d %H:%M:%S')
+                order_date_from = order_date_from - timedelta(hours=timezone)
+                order_date_from = order_date_from.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                order_date_from = datetime.strptime(data.get("order_date_from"), '%Y-%m-%d')
+            domain.append(("date_order", ">=", order_date_from))
+            
 
         if data.get("order_date_to"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("date_order", "<=", data.get("order_date_to")))
+            try:
+                order_date_to = datetime.strptime(data.get("order_date_to"), '%Y-%m-%d %H:%M:%S')
+                order_date_to = order_date_to - timedelta(hours=timezone)
+                order_date_to = order_date_to.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                order_date_to = datetime.strptime(data.get("order_date_to"), '%Y-%m-%d')
+            domain.append(("date_order", "<=", order_date_to))
 
         if data.get("order_date"):
             today = datetime.now()

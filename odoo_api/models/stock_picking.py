@@ -34,32 +34,68 @@ class StockPicking(models.Model):
         if data.get("create_date_from"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("create_date", ">=", data.get("create_date_from")))
+            try:
+                create_date_from = datetime.strptime(data.get("create_date_from"), '%Y-%m-%d %H:%M:%S')
+                create_date_from = create_date_from - timedelta(hours=timezone)
+                create_date_from = create_date_from.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                create_date_from = datetime.strptime(data.get("create_date_from"), '%Y-%m-%d')
+            domain.append(("create_date", ">=", create_date_from))
 
         if data.get("create_date_to"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("create_date", "<=", data.get("create_date_to")))
+            try:
+                create_date_to = datetime.strptime(data.get("create_date_to"), '%Y-%m-%d %H:%M:%S')
+                create_date_to = create_date_to - timedelta(hours=timezone)
+                create_date_to = create_date_to.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                create_date_to = datetime.strptime(data.get("create_date_to"), '%Y-%m-%d')
+            domain.append(("create_date", "<=", create_date_to))
 
         if data.get("update_from"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("write_date", ">=", data.get("update_from")))
+            try:
+                update_from = datetime.strptime(data.get("update_from"), '%Y-%m-%d %H:%M:%S')
+                update_from = update_from - timedelta(hours=timezone)
+                update_from = update_from.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                update_from = datetime.strptime(data.get("update_from"), '%Y-%m-%d')
+            domain.append(("write_date", ">=", update_from))
 
         if data.get("update_to"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("write_date", "<=", data.get("update_to")))
+            try:
+                update_to = datetime.strptime(data.get("update_to"), '%Y-%m-%d %H:%M:%S')
+                update_to = update_to - timedelta(hours=timezone)
+                update_to = update_to.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                update_to = datetime.strptime(data.get("update_to"), '%Y-%m-%d')
+            domain.append(("write_date", "<=", update_to))
         
         if data.get("scheduled_date_from"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("scheduled_date", ">=", data.get("scheduled_date_from")))
+            try:
+                scheduled_date_from = datetime.strptime(data.get("scheduled_date_from"), '%Y-%m-%d %H:%M:%S')
+                scheduled_date_from = scheduled_date_from - timedelta(hours=timezone)
+                scheduled_date_from = scheduled_date_from.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                scheduled_date_from = datetime.strptime(data.get("scheduled_date_from"), '%Y-%m-%d')
+            domain.append(("scheduled_date", ">=", scheduled_date_from))
 
         if data.get("scheduled_date_to"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("scheduled_date", "<=", data.get("scheduled_date_to")))
+            try:
+                scheduled_date_to = datetime.strptime(data.get("scheduled_date_to"), '%Y-%m-%d %H:%M:%S')
+                scheduled_date_to = scheduled_date_to - timedelta(hours=timezone)
+                scheduled_date_to = scheduled_date_to.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                scheduled_date_to = datetime.strptime(data.get("scheduled_date_to"), '%Y-%m-%d')
+            domain.append(("scheduled_date", "<=", scheduled_date_to))
 
         if data.get("scheduled_date"):
             today = datetime.now()
@@ -154,12 +190,24 @@ class StockPicking(models.Model):
         if data.get("effective_date_from"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("date_done", ">=", data.get("effective_date_from")))
+            try:
+                effective_date_from = datetime.strptime(data.get("effective_date_from"), '%Y-%m-%d %H:%M:%S')
+                effective_date_from = effective_date_from - timedelta(hours=timezone)
+                effective_date_from = effective_date_from.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                effective_date_from = datetime.strptime(data.get("effective_date_from"), '%Y-%m-%d')
+            domain.append(("date_done", ">=", effective_date_from))
 
         if data.get("effective_date_to"):
             if domain:
                 domain.insert(0, '&')
-            domain.append(("date_done", "<=", data.get("effective_date_to")))
+            try:
+                effective_date_to = datetime.strptime(data.get("effective_date_to"), '%Y-%m-%d %H:%M:%S')
+                effective_date_to = effective_date_to - timedelta(hours=timezone)
+                effective_date_to = effective_date_to.strftime('%Y-%m-%d %H:%M:%S')
+            except ValueError: 
+                effective_date_to = datetime.strptime(data.get("effective_date_to"), '%Y-%m-%d')
+            domain.append(("date_done", "<=", effective_date_to))
 
         if data.get("effective_date"):
             today = datetime.now()
