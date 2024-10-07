@@ -33,6 +33,10 @@ class MyApiController(http.Controller):
                     models = request.env['crm.activity.report']
                     if hasattr(models, 'GetActivity'):
                         response_data = getattr(models, 'GetActivity')(data.get("Filter"))
+                elif header.get("HTTP_ODOO_ACTION") == "GetActivityCRM" or data.get("ODOO_ACTION")=="GetActivityCRM":
+                    models = request.env['crm.activity.report']
+                    if hasattr(models, 'GetActivityCRM'):
+                        response_data = getattr(models, 'GetActivityCRM')(data.get("Filter"))
                 else :
                     data["header"] = header
                     response_data = data
