@@ -1,16 +1,24 @@
 
 from odoo import models, fields
-import datetime
-from datetime import date
-from datetime import date, timedelta
+# import datetime
+# from datetime import date
+from datetime import date, timedelta, datetime
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
     
     
     def GetInvoice(self,data):
+        timezone = 0
         domain = []
         response = []
+
+        if data.get("time_zone"):
+            timezone = data.get("time_zone")
+
         if data.get("name"):
             domain.append(("name", "in", data.get("name")))
 
@@ -60,8 +68,10 @@ class AccountMove(models.Model):
             # Handle "this_month"
             if data.get("invoice_date") == "this_month":
                 first_day_of_month = today.replace(day=1)
+                # first_day_of_month = first_day_of_month + timedelta(hours=timezone)
                 last_day_of_month = (today.replace(day=1).replace(month=today.month + 1) - timedelta(days=1)
                                     if today.month < 12 else today.replace(month=12, day=31))
+                # last_day_of_month = last_day_of_month + timedelta(hours=timezone)
                 if domain:
                     domain.insert(0, '&')
                 domain.append(("invoice_date", ">=", first_day_of_month))
@@ -70,7 +80,9 @@ class AccountMove(models.Model):
             # Handle "this_year"
             elif data.get("invoice_date") == "this_year":
                 first_day_of_year = today.replace(month=1, day=1)
+                # first_day_of_year = first_day_of_year + timedelta(hours=timezone)
                 last_day_of_year = today.replace(month=12, day=31)
+                # last_day_of_year = last_day_of_year + timedelta(hours=timezone)
                 if domain:
                     domain.insert(0, '&')
                 domain.append(("invoice_date", ">=", first_day_of_year))
@@ -80,7 +92,9 @@ class AccountMove(models.Model):
             elif data.get("invoice_date") == "last_year":
                 last_year = today.year - 1
                 first_day_of_last_year = today.replace(year=last_year, month=1, day=1)
+                # first_day_of_last_year = first_day_of_last_year + timedelta(hours=timezone)
                 last_day_of_last_year = today.replace(year=last_year, month=12, day=31)
+                # last_day_of_last_year = last_day_of_last_year + timedelta(hours=timezone)
                 if domain:
                     domain.insert(0, '&')
                 domain.append(("invoice_date", ">=", first_day_of_last_year))
@@ -88,8 +102,10 @@ class AccountMove(models.Model):
 
             # Handle "this_au_year" (July 1, 2024 - June 30, 2025)
             elif data.get("invoice_date") == "this_au_year":
-                first_day_of_au_year = date(today.year, 7, 1)  # July 1, 2024
-                last_day_of_au_year = date(today.year + 1, 6, 30)  # June 30, 2025
+                first_day_of_au_year = date(today.year, 7, 1) 
+                # first_day_of_au_year = first_day_of_au_year + timedelta(hours=timezone)
+                last_day_of_au_year = date(today.year + 1, 6, 30) 
+                # last_day_of_au_year = last_day_of_au_year + timedelta(hours=timezone)
                 if domain:
                     domain.insert(0, '&')
                 domain.append(("invoice_date", ">=", first_day_of_au_year))
@@ -98,7 +114,9 @@ class AccountMove(models.Model):
             # Handle "last_au_year" (July 1, 2023 - June 30, 2024)
             elif data.get("invoice_date") == "last_au_year":
                 first_day_of_last_au_year = date(today.year - 1, 7, 1)  # July 1, 2023
+                # first_day_of_last_au_year = first_day_of_last_au_year + timedelta(hours=timezone)
                 last_day_of_last_au_year = date(today.year, 6, 30)  # June 30, 2024
+                # last_day_of_last_au_year = last_day_of_last_au_year + timedelta(hours=timezone)
                 if domain:
                     domain.insert(0, '&')
                 domain.append(("invoice_date", ">=", first_day_of_last_au_year))
@@ -107,7 +125,9 @@ class AccountMove(models.Model):
             # Handle "this_nz_year" (April 1, 2024 - March 31, 2025)
             elif data.get("invoice_date") == "this_nz_year":
                 first_day_of_nz_year = date(today.year, 4, 1)  # April 1, 2024
+                # first_day_of_nz_year = first_day_of_nz_year + timedelta(hours=timezone)
                 last_day_of_nz_year = date(today.year + 1, 3, 31)  # March 31, 2025
+                # last_day_of_nz_year = last_day_of_nz_year + timedelta(hours=timezone)
                 if domain:
                     domain.insert(0, '&')
                 domain.append(("invoice_date", ">=", first_day_of_nz_year))
@@ -116,7 +136,9 @@ class AccountMove(models.Model):
             # Handle "last_nz_year" (April 1, 2023 - March 31, 2024)
             elif data.get("invoice_date") == "last_nz_year":
                 first_day_of_last_nz_year = date(today.year - 1, 4, 1)  # April 1, 2023
+                # first_day_of_last_nz_year = first_day_of_last_nz_year + timedelta(hours=timezone)
                 last_day_of_last_nz_year = date(today.year, 3, 31)  # March 31, 2024
+                # last_day_of_last_nz_year = last_day_of_last_nz_year + timedelta(hours=timezone)
                 if domain:
                     domain.insert(0, '&')
                 domain.append(("invoice_date", ">=", first_day_of_last_nz_year))
@@ -131,6 +153,7 @@ class AccountMove(models.Model):
             domain.append(("state", "in", data.get("state")))
 
         if domain:
+            _logger.info(domain)
             invoices = self.env["account.move"].search(domain)
             for invoice in invoices:
                 invoice_data = {}
@@ -142,8 +165,9 @@ class AccountMove(models.Model):
                             if hasattr(eval("invoice."+item_split[0]), item_split[1]):
                                 invoice_data[item] = getattr(eval("invoice."+item_split[0]), item_split[1])
                         else :
-                            if isinstance(getattr(invoice, item_split[0]), datetime.datetime):
-                                invoice_data[item] = getattr(invoice, item_split[0]).strftime('%Y-%m-%d %H:%M:%S')
+                            if isinstance(getattr(invoice, item_split[0]), datetime):
+                                datetime_data = getattr(invoice, item_split[0]) + timedelta(hours=timezone)
+                                invoice_data[item] = datetime_data.strftime('%Y-%m-%d %H:%M:%S')
                             elif isinstance(getattr(invoice, item_split[0]), date):
                                 invoice_data[item] = getattr(invoice, item_split[0]).strftime('%Y-%m-%d')
                             else :

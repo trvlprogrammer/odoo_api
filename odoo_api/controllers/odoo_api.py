@@ -44,6 +44,7 @@ class MyApiController(http.Controller):
                 json.dumps({
                     'status': 'Success',
                     'item': response_data,
+                    'version' : '1.0'
                 }),
                 content_type='application/json',
                 status=200
@@ -54,6 +55,7 @@ class MyApiController(http.Controller):
                 json.dumps({
                     'status': 'Error',
                     'message': str(e),
+                    'version' : '1.0'
                 }),
                 content_type='application/json',
                 status=500
