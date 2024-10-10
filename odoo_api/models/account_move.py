@@ -87,7 +87,8 @@ class AccountMove(models.Model):
             domain.append(("invoice_date", "<=", data.get("invoice_date_to")))
 
         if data.get("invoice_date"):
-            today = date.today()
+            today = datetime.now() - timedelta(hours=timezone)
+            today = today.date()
             
             # Handle "this_month"
             if data.get("invoice_date") == "this_month":
@@ -178,7 +179,7 @@ class AccountMove(models.Model):
 
         if domain:
             _logger.info(domain)
-            invoices = self.env["account.move"].search(domain)
+            invoices = self.env["account.move"].with_context(active_test=False).search(domain)
             for invoice in invoices:
                 invoice_data = {}
 

@@ -94,7 +94,8 @@ class SaleOrder(models.Model):
             domain.append(("date_order", "<=", order_date_to))
 
         if data.get("order_date"):
-            today = datetime.now()
+            today = datetime.now() - timedelta(hours=timezone)
+            # today = datetime.now()
             
             # Handle "this_month"
             if data.get("order_date") == "this_month":
@@ -203,7 +204,7 @@ class SaleOrder(models.Model):
 
         if domain:
             _logger.info(domain)
-            orders = self.env["sale.order"].search(domain)
+            orders = self.env["sale.order"].with_context(active_test=False).search(domain)
             for order in orders:
                 order_data = {}
 

@@ -98,7 +98,7 @@ class StockPicking(models.Model):
             domain.append(("scheduled_date", "<=", scheduled_date_to))
 
         if data.get("scheduled_date"):
-            today = datetime.now()
+            today = datetime.now() - timedelta(hours=timezone)
             if data.get("scheduled_date") == "this_month":                
                 first_day_of_month = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
                 first_day_of_month = first_day_of_month - timedelta(hours=timezone)
@@ -210,7 +210,7 @@ class StockPicking(models.Model):
             domain.append(("date_done", "<=", effective_date_to))
 
         if data.get("effective_date"):
-            today = datetime.now()
+            today = datetime.now() - timedelta(hours=timezone)
             if data.get("effective_date") == "this_month":                
                 first_day_of_month = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
                 first_day_of_month = first_day_of_month - timedelta(hours=timezone)
@@ -306,7 +306,7 @@ class StockPicking(models.Model):
 
         if domain:
             _logger.info(domain)
-            pickings = self.env["stock.picking"].search(domain)
+            pickings = self.env["stock.picking"].with_context(active_test=False).search(domain)
             for picking in pickings:
                 picking_data = {}
 

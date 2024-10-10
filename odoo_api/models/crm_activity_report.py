@@ -79,41 +79,37 @@ class CrmActivityReport(models.Model):
         if data.get("date_deadline_from"):
             if domain:
                 domain.insert(0, '&')
-            try:
-                date_deadline_from = datetime.strptime(data.get("date_deadline_from"), '%Y-%m-%d %H:%M:%S')
-                date_deadline_from = date_deadline_from - timedelta(hours=timezone)
-                date_deadline_from = date_deadline_from.strftime('%Y-%m-%d %H:%M:%S')
-            except ValueError: 
-                date_deadline_from = datetime.strptime(data.get("date_deadline_from"), '%Y-%m-%d')
-            domain.append(("date_deadline", ">=", date_deadline_from))
+            # try:
+            #     date_deadline_from = datetime.strptime(data.get("date_deadline_from"), '%Y-%m-%d %H:%M:%S')
+            #     date_deadline_from = date_deadline_from - timedelta(hours=timezone)
+            #     date_deadline_from = date_deadline_from.strftime('%Y-%m-%d %H:%M:%S')
+            # except ValueError: 
+            #     date_deadline_from = datetime.strptime(data.get("date_deadline_from"), '%Y-%m-%d')
+            domain.append(("date_deadline", ">=", data.get("date_deadline_from")))
 
         if data.get("date_deadline_to"):
             if domain:
                 domain.insert(0, '&')
-            try:
-                date_deadline_to = datetime.strptime(data.get("date_deadline_to"), '%Y-%m-%d %H:%M:%S')
-                date_deadline_to = date_deadline_to - timedelta(hours=timezone)
-                date_deadline_to = date_deadline_to.strftime('%Y-%m-%d %H:%M:%S')
-            except ValueError: 
-                date_deadline_to = datetime.strptime(data.get("date_deadline_to"), '%Y-%m-%d')
-            domain.append(("date_deadline", "<=", date_deadline_to))
+            # try:
+            #     date_deadline_to = datetime.strptime(data.get("date_deadline_to"), '%Y-%m-%d %H:%M:%S')
+            #     date_deadline_to = date_deadline_to - timedelta(hours=timezone)
+            #     date_deadline_to = date_deadline_to.strftime('%Y-%m-%d %H:%M:%S')
+            # except ValueError: 
+            #     date_deadline_to = datetime.strptime(data.get("date_deadline_to"), '%Y-%m-%d')
+            domain.append(("date_deadline", "<=", data.get("date_deadline_to")))
 
 
         if data.get("date_deadline"):
-            today = datetime.now()
+            today = datetime.now() - timedelta(hours=timezone)
+            today = today.date()
 
             # Handle "this_month"
             if data.get("date_deadline") == "this_month":
-                first_day_of_month = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-                first_day_of_month = first_day_of_month - timedelta(hours=timezone)
-                
-                if today.month == 12:  # Handle December case
-                    last_day_of_month = today.replace(month=12, day=31, hour=23, minute=59, second=59, microsecond=999999)
-                else:
-                    first_day_of_next_month = today.replace(day=1, month=today.month + 1, hour=0, minute=0, second=0, microsecond=0)
-                    last_day_of_month = first_day_of_next_month - timedelta(seconds=1)
-                
-                last_day_of_month = last_day_of_month - timedelta(hours=timezone)
+                first_day_of_month = today.replace(day=1)
+                # first_day_of_month = first_day_of_month + timedelta(hours=timezone)
+                last_day_of_month = (today.replace(day=1).replace(month=today.month + 1) - timedelta(days=1)
+                                    if today.month < 12 else today.replace(month=12, day=31))
+                # last_day_of_month = last_day_of_month + timedelta(hours=timezone)
                 
                 if domain:
                     domain.insert(0, '&')
@@ -122,11 +118,9 @@ class CrmActivityReport(models.Model):
 
             # Handle "this_year"
             elif data.get("date_deadline") == "this_year":
-                first_day_of_year = today.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
-                first_day_of_year = first_day_of_year - timedelta(hours=timezone)
-                
-                last_day_of_year = today.replace(month=12, day=31, hour=23, minute=59, second=59, microsecond=999999)
-                last_day_of_year = last_day_of_year - timedelta(hours=timezone)
+                first_day_of_year = today.replace(month=1, day=1)
+                # first_day_of_year = first_day_of_year + timedelta(hours=timezone)
+                last_day_of_year = today.replace(month=12, day=31)
                 
                 if domain:
                     domain.insert(0, '&')
@@ -136,11 +130,10 @@ class CrmActivityReport(models.Model):
             # Handle "last_year"
             elif data.get("date_deadline") == "last_year":
                 last_year = today.year - 1
-                first_day_of_last_year = today.replace(year=last_year, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
-                first_day_of_last_year = first_day_of_last_year - timedelta(hours=timezone)
-                
-                last_day_of_last_year = today.replace(year=last_year, month=12, day=31, hour=23, minute=59, second=59, microsecond=999999)
-                last_day_of_last_year = last_day_of_last_year - timedelta(hours=timezone)
+                first_day_of_last_year = today.replace(year=last_year, month=1, day=1)
+                # first_day_of_last_year = first_day_of_last_year + timedelta(hours=timezone)
+                last_day_of_last_year = today.replace(year=last_year, month=12, day=31)
+                # last_day_of_last_year = last_day_of_last_year + timedelta(hours=timezone)
                 
                 if domain:
                     domain.insert(0, '&')
@@ -149,11 +142,10 @@ class CrmActivityReport(models.Model):
 
             # Handle "this_au_year" (July 1, 2024 - June 30, 2025)
             elif data.get("date_deadline") == "this_au_year":
-                first_day_of_au_year = datetime(today.year, 7, 1, 0, 0, 0)
-                first_day_of_au_year = first_day_of_au_year - timedelta(hours=timezone)
-                
-                last_day_of_au_year = datetime(today.year + 1, 6, 30, 23, 59, 59)
-                last_day_of_au_year = last_day_of_au_year - timedelta(hours=timezone)
+                first_day_of_au_year = date(today.year, 7, 1) 
+                # first_day_of_au_year = first_day_of_au_year + timedelta(hours=timezone)
+                last_day_of_au_year = date(today.year + 1, 6, 30) 
+                # last_day_of_au_year = last_day_of_au_year + timedelta(hours=timezone)
                 
                 if domain:
                     domain.insert(0, '&')
@@ -162,11 +154,10 @@ class CrmActivityReport(models.Model):
 
             # Handle "last_au_year" (July 1, 2023 - June 30, 2024)
             elif data.get("date_deadline") == "last_au_year":
-                first_day_of_last_au_year = datetime(today.year - 1, 7, 1, 0, 0, 0)
-                first_day_of_last_au_year = first_day_of_last_au_year - timedelta(hours=timezone)
-                
-                last_day_of_last_au_year = datetime(today.year, 6, 30, 23, 59, 59)
-                last_day_of_last_au_year = last_day_of_last_au_year - timedelta(hours=timezone)
+                first_day_of_last_au_year = date(today.year - 1, 7, 1)  # July 1, 2023
+                # first_day_of_last_au_year = first_day_of_last_au_year + timedelta(hours=timezone)
+                last_day_of_last_au_year = date(today.year, 6, 30)  # June 30, 2024
+                # last_day_of_last_au_year = last_day_of_last_au_year + timedelta(hours=timezone)
                 
                 if domain:
                     domain.insert(0, '&')
@@ -175,11 +166,10 @@ class CrmActivityReport(models.Model):
 
             # Handle "this_nz_year" (April 1, 2024 - March 31, 2025)
             elif data.get("date_deadline") == "this_nz_year":
-                first_day_of_nz_year = datetime(today.year, 4, 1, 0, 0, 0)
-                first_day_of_nz_year = first_day_of_nz_year - timedelta(hours=timezone)
-                
-                last_day_of_nz_year = datetime(today.year + 1, 3, 31, 23, 59, 59)
-                last_day_of_nz_year = last_day_of_nz_year - timedelta(hours=timezone)
+                first_day_of_nz_year = date(today.year, 4, 1)  # April 1, 2024
+                # first_day_of_nz_year = first_day_of_nz_year + timedelta(hours=timezone)
+                last_day_of_nz_year = date(today.year + 1, 3, 31)  # March 31, 2025
+                # last_day_of_nz_year = last_day_of_nz_year + timedelta(hours=timezone)
                 
                 if domain:
                     domain.insert(0, '&')
@@ -188,11 +178,10 @@ class CrmActivityReport(models.Model):
 
             # Handle "last_nz_year" (April 1, 2023 - March 31, 2024)
             elif data.get("date_deadline") == "last_nz_year":
-                first_day_of_last_nz_year = datetime(today.year - 1, 4, 1, 0, 0, 0)
-                first_day_of_last_nz_year = first_day_of_last_nz_year - timedelta(hours=timezone)
-                
-                last_day_of_last_nz_year = datetime(today.year, 3, 31, 23, 59, 59)
-                last_day_of_last_nz_year = last_day_of_last_nz_year - timedelta(hours=timezone)
+                first_day_of_last_nz_year = date(today.year - 1, 4, 1)  # April 1, 2023
+                # first_day_of_last_nz_year = first_day_of_last_nz_year + timedelta(hours=timezone)
+                last_day_of_last_nz_year = date(today.year, 3, 31)  # March 31, 2024
+                # last_day_of_last_nz_year = last_day_of_last_nz_year + timedelta(hours=timezone)
                 
                 if domain:
                     domain.insert(0, '&')
@@ -202,41 +191,24 @@ class CrmActivityReport(models.Model):
         if data.get("date_done_from"):
             if domain:
                 domain.insert(0, '&')
-            try:
-                date_done_from = datetime.strptime(data.get("date_done_from"), '%Y-%m-%d %H:%M:%S')
-                date_done_from = date_done_from - timedelta(hours=timezone)
-                date_done_from = date_done_from.strftime('%Y-%m-%d %H:%M:%S')
-            except ValueError: 
-                date_done_from = datetime.strptime(data.get("date_done_from"), '%Y-%m-%d')
-            domain.append(("date_done", ">=", date_deadline_from))
+            domain.append(("date_done", ">=", data.get("date_done_from")))
 
         if data.get("date_done_to"):
             if domain:
                 domain.insert(0, '&')
-            try:
-                date_done_to = datetime.strptime(data.get("date_done_to"), '%Y-%m-%d %H:%M:%S')
-                date_done_to = date_done_to - timedelta(hours=timezone)
-                date_done_to = date_done_to.strftime('%Y-%m-%d %H:%M:%S')
-            except ValueError: 
-                date_done_to = datetime.strptime(data.get("date_done_to"), '%Y-%m-%d')
-            domain.append(("date_done", "<=", date_done_to))
+            domain.append(("date_done", "<=", data.get("date_done_to")))
 
 
         if data.get("date_done"):
-            today = datetime.now()
+            today = datetime.now() - timedelta(hours=timezone)
+            today = today.date()
 
             # Handle "this_month"
             if data.get("date_done") == "this_month":
-                first_day_of_month = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-                first_day_of_month = first_day_of_month - timedelta(hours=timezone)
-                
-                if today.month == 12:  # Handle December case
-                    last_day_of_month = today.replace(month=12, day=31, hour=23, minute=59, second=59, microsecond=999999)
-                else:
-                    first_day_of_next_month = today.replace(day=1, month=today.month + 1, hour=0, minute=0, second=0, microsecond=0)
-                    last_day_of_month = first_day_of_next_month - timedelta(seconds=1)
-                
-                last_day_of_month = last_day_of_month - timedelta(hours=timezone)
+                first_day_of_month = today.replace(day=1)
+                # first_day_of_month = first_day_of_month + timedelta(hours=timezone)
+                last_day_of_month = (today.replace(day=1).replace(month=today.month + 1) - timedelta(days=1)
+                                    if today.month < 12 else today.replace(month=12, day=31))
                 
                 if domain:
                     domain.insert(0, '&')
@@ -245,11 +217,10 @@ class CrmActivityReport(models.Model):
 
             # Handle "this_year"
             elif data.get("date_done") == "this_year":
-                first_day_of_year = today.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
-                first_day_of_year = first_day_of_year - timedelta(hours=timezone)
-                
-                last_day_of_year = today.replace(month=12, day=31, hour=23, minute=59, second=59, microsecond=999999)
-                last_day_of_year = last_day_of_year - timedelta(hours=timezone)
+                first_day_of_year = today.replace(month=1, day=1)
+                # first_day_of_year = first_day_of_year + timedelta(hours=timezone)
+                last_day_of_year = today.replace(month=12, day=31)
+                # last_day_of_year = last_day_of_year + timedelta(hours=timezone)
                 
                 if domain:
                     domain.insert(0, '&')
@@ -259,11 +230,10 @@ class CrmActivityReport(models.Model):
             # Handle "last_year"
             elif data.get("date_done") == "last_year":
                 last_year = today.year - 1
-                first_day_of_last_year = today.replace(year=last_year, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
-                first_day_of_last_year = first_day_of_last_year - timedelta(hours=timezone)
-                
-                last_day_of_last_year = today.replace(year=last_year, month=12, day=31, hour=23, minute=59, second=59, microsecond=999999)
-                last_day_of_last_year = last_day_of_last_year - timedelta(hours=timezone)
+                first_day_of_last_year = today.replace(year=last_year, month=1, day=1)
+                # first_day_of_last_year = first_day_of_last_year + timedelta(hours=timezone)
+                last_day_of_last_year = today.replace(year=last_year, month=12, day=31)
+                # last_day_of_last_year = last_day_of_last_year + timedelta(hours=timezone)
                 
                 if domain:
                     domain.insert(0, '&')
@@ -272,11 +242,10 @@ class CrmActivityReport(models.Model):
 
             # Handle "this_au_year" (July 1, 2024 - June 30, 2025)
             elif data.get("date_done") == "this_au_year":
-                first_day_of_au_year = datetime(today.year, 7, 1, 0, 0, 0)
-                first_day_of_au_year = first_day_of_au_year - timedelta(hours=timezone)
-                
-                last_day_of_au_year = datetime(today.year + 1, 6, 30, 23, 59, 59)
-                last_day_of_au_year = last_day_of_au_year - timedelta(hours=timezone)
+                first_day_of_au_year = date(today.year, 7, 1) 
+                # first_day_of_au_year = first_day_of_au_year + timedelta(hours=timezone)
+                last_day_of_au_year = date(today.year + 1, 6, 30) 
+                # last_day_of_au_year = last_day_of_au_year + timedelta(hours=timezone)
                 
                 if domain:
                     domain.insert(0, '&')
@@ -285,11 +254,10 @@ class CrmActivityReport(models.Model):
 
             # Handle "last_au_year" (July 1, 2023 - June 30, 2024)
             elif data.get("date_done") == "last_au_year":
-                first_day_of_last_au_year = datetime(today.year - 1, 7, 1, 0, 0, 0)
-                first_day_of_last_au_year = first_day_of_last_au_year - timedelta(hours=timezone)
-                
-                last_day_of_last_au_year = datetime(today.year, 6, 30, 23, 59, 59)
-                last_day_of_last_au_year = last_day_of_last_au_year - timedelta(hours=timezone)
+                first_day_of_last_au_year = date(today.year - 1, 7, 1)  # July 1, 2023
+                # first_day_of_last_au_year = first_day_of_last_au_year + timedelta(hours=timezone)
+                last_day_of_last_au_year = date(today.year, 6, 30)  # June 30, 2024
+                # last_day_of_last_au_year = last_day_of_last_au_year + timedelta(hours=timezone)
                 
                 if domain:
                     domain.insert(0, '&')
@@ -298,11 +266,10 @@ class CrmActivityReport(models.Model):
 
             # Handle "this_nz_year" (April 1, 2024 - March 31, 2025)
             elif data.get("date_done") == "this_nz_year":
-                first_day_of_nz_year = datetime(today.year, 4, 1, 0, 0, 0)
-                first_day_of_nz_year = first_day_of_nz_year - timedelta(hours=timezone)
-                
-                last_day_of_nz_year = datetime(today.year + 1, 3, 31, 23, 59, 59)
-                last_day_of_nz_year = last_day_of_nz_year - timedelta(hours=timezone)
+                first_day_of_nz_year = date(today.year, 4, 1)  # April 1, 2024
+                # first_day_of_nz_year = first_day_of_nz_year + timedelta(hours=timezone)
+                last_day_of_nz_year = date(today.year + 1, 3, 31)  # March 31, 2025
+                # last_day_of_nz_year = last_day_of_nz_year + timedelta(hours=timezone)
                 
                 if domain:
                     domain.insert(0, '&')
@@ -311,11 +278,10 @@ class CrmActivityReport(models.Model):
 
             # Handle "last_nz_year" (April 1, 2023 - March 31, 2024)
             elif data.get("date_done") == "last_nz_year":
-                first_day_of_last_nz_year = datetime(today.year - 1, 4, 1, 0, 0, 0)
-                first_day_of_last_nz_year = first_day_of_last_nz_year - timedelta(hours=timezone)
-                
-                last_day_of_last_nz_year = datetime(today.year, 3, 31, 23, 59, 59)
-                last_day_of_last_nz_year = last_day_of_last_nz_year - timedelta(hours=timezone)
+                first_day_of_last_nz_year = date(today.year - 1, 4, 1)  # April 1, 2023
+                # first_day_of_last_nz_year = first_day_of_last_nz_year + timedelta(hours=timezone)
+                last_day_of_last_nz_year = date(today.year, 3, 31)  # March 31, 2024
+                # last_day_of_last_nz_year = last_day_of_last_nz_year + timedelta(hours=timezone)
                 
                 if domain:
                     domain.insert(0, '&')
@@ -329,7 +295,7 @@ class CrmActivityReport(models.Model):
 
         if domain:
             _logger.info(domain)
-            activities = self.env["mail.activity"].search(domain)
+            activities = self.env["mail.activity"].with_context(active_test=False).search(domain)
             for activity in activities:
                 activity_data = {}
 
@@ -548,7 +514,7 @@ class CrmActivityReport(models.Model):
 
         if domain:
             _logger.info(domain)
-            activities = self.env["crm.activity.report"].search(domain)
+            activities = self.env["crm.activity.report"].with_context(active_test=False).search(domain)
             for activity in activities:
                 activity_data = {}
 
@@ -570,3 +536,9 @@ class CrmActivityReport(models.Model):
                 response.append(activity_data)
             
         return response
+
+
+# class MailMail(models.Model):
+#     _inherit = 'mail.activity'
+
+#     date_done = fields.Date("Completed Date")
