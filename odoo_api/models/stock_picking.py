@@ -303,6 +303,12 @@ class StockPicking(models.Model):
             if domain:
                 domain.insert(0, '&')
             domain.append(("state", "in", data.get("state")))
+        
+        if data.get("backorder"):
+            if domain:
+                domain.insert(0, '&')
+            if data.get("backorder") == "n":
+                domain.append(("backorder_id", "=", False))
 
         if domain:
             _logger.info(domain)
